@@ -1,0 +1,97 @@
+---
+import type { Project } from '../content/site';
+import MetricReadout from './MetricReadout.astro';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<article class="border border-grid bg-panel">
+  <header class="flex flex-wrap items-baseline justify-between gap-2 border-b border-grid px-6 py-4">
+    <h3 class="font-display text-2xl font-semibold uppercase tracking-tight">{project.name}</h3>
+    <span class="flex items-center gap-2 font-mono text-xs text-ok">
+      <span class="h-2 w-2 rounded-full bg-ok" aria-hidden="true"></span>
+      live
+    </span>
+  </header>
+
+  <div class="px-6 py-5">
+    <p class="text-ink/90">{project.tagline}</p>
+
+    {
+      project.metric && (
+        <div class="mt-5 border-t border-grid pt-5">
+          <MetricReadout metric={project.metric} />
+        </div>
+      )
+    }
+
+    <div class="mt-5 border-t border-grid pt-5">
+      <h4 class="font-mono text-xs uppercase tracking-wide text-ink/70">decisiones</h4>
+      <ul class="mt-3 space-y-2">
+        {
+          project.decisions.map((decision) => (
+            <li class="flex gap-2 text-sm leading-relaxed text-ink/90">
+              <span class="font-mono text-ink/50" aria-hidden="true">
+                -&gt;
+              </span>
+              <span>{decision}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="mt-5 border-t border-grid pt-5">
+      <h4 class="font-mono text-xs uppercase tracking-wide text-ink/70">stack</h4>
+      <ul class="mt-3 flex flex-wrap gap-2">
+        {
+          project.stack.map((tech) => (
+            <li class="border border-grid bg-canvas px-2 py-1 font-mono text-xs text-ink/90">
+              {tech}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="mt-6 flex flex-wrap gap-4 border-t border-grid pt-5 font-mono text-sm">
+      {
+        project.repos.map((repo) => (
+          <a
+            href={repo.url}
+            rel="noopener"
+            class="text-ink underline decoration-ink/30 underline-offset-4 transition hover:decoration-ink"
+          >
+            $ {repo.label.toLowerCase()}
+          </a>
+        ))
+      }
+      {
+        project.videoUrl && (
+          <a
+            href={project.videoUrl}
+            rel="noopener"
+            class="text-ink underline decoration-ink/30 underline-offset-4 transition hover:decoration-ink"
+          >
+            $ ver demo (60s)
+          </a>
+        )
+      }
+      {
+        project.demoUrl && (
+          <a
+            href={project.demoUrl}
+            rel="noopener"
+            class="text-ink underline decoration-ink/30 underline-offset-4 transition hover:decoration-ink"
+          >
+            $ ver demo
+          </a>
+        )
+      }
+    </div>
+  </div>
+</article>

@@ -1,0 +1,33 @@
+---
+import type { Project } from '../content/site';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<article class="border border-dashed border-grid px-6 py-5">
+  <header class="flex flex-wrap items-baseline justify-between gap-2">
+    <h3 class="font-display text-xl font-semibold uppercase tracking-tight text-ink/90">
+      {project.name}
+    </h3>
+    <span class="flex items-center gap-2 font-mono text-xs text-ink/70">
+      <span class="h-2 w-2 rounded-full bg-ink/40" aria-hidden="true"></span>
+      en desarrollo
+    </span>
+  </header>
+
+  <p class="mt-3 text-sm text-ink/90">{project.tagline}</p>
+
+  {
+    project.stack.length > 0 && (
+      <ul class="mt-4 flex flex-wrap gap-2">
+        {project.stack.map((tech) => (
+          <li class="border border-grid px-2 py-1 font-mono text-xs text-ink/70">{tech}</li>
+        ))}
+      </ul>
+    )
+  }
+</article>
