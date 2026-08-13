@@ -12,11 +12,18 @@
  *   - `public/media/`     → screenshots de los proyectos
  */
 
+export interface MetricDistribution {
+  color: 'ok' | 'flag';
+  count: number;
+}
+
 export interface Metric {
   /** Lo que se destaca en grande: "0", "<100ms". */
   value: string;
   label: string;
   detail?: string;
+  /** Desglose real para el elemento firma (puntos de status), no un porcentaje. */
+  distribution?: MetricDistribution[];
 }
 
 export interface RepoLink {
@@ -99,6 +106,10 @@ export const projects: Project[] = [
       value: '0',
       label: 'dobles reservas en 100 requests concurrentes al mismo horario',
       detail: '1 creada · 99 × HTTP 409',
+      distribution: [
+        { color: 'ok', count: 1 },
+        { color: 'flag', count: 99 },
+      ],
     },
     decisions: [
       'Monolito modular por decisión, no por defecto: los microservicios no resolvían ningún problema que yo tuviera.',
