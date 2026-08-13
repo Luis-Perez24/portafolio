@@ -1,0 +1,75 @@
+---
+import type { Site } from '../content/site';
+
+interface Props {
+  site: Site;
+}
+
+const { site } = Astro.props;
+---
+
+<footer id="contacto" aria-labelledby="titulo-contacto" class="bg-blueprint-grid border-t border-grid">
+  <div class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+    <p class="font-mono text-sm text-ink/70">// 04</p>
+    <h2 id="titulo-contacto" class="mt-2 font-display text-3xl font-semibold uppercase tracking-tight">
+      Contacto
+    </h2>
+
+    <ul class="mt-8 flex flex-wrap gap-x-8 gap-y-3 font-mono text-sm">
+      <li>
+        <a
+          href={`mailto:${site.email}`}
+          class="text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
+        >
+          {site.email}
+        </a>
+      </li>
+      <li>
+        <a
+          href={site.github}
+          rel="me noopener"
+          class="text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
+        >
+          github
+        </a>
+      </li>
+      {
+        site.linkedin && (
+          <li>
+            <a
+              href={site.linkedin}
+              rel="me noopener"
+              class="text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
+            >
+              linkedin
+            </a>
+          </li>
+        )
+      }
+      {
+        site.cvPath && (
+          <li>
+            <a
+              href={site.cvPath}
+              download
+              class="text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
+            >
+              descargar cv
+            </a>
+          </li>
+        )
+      }
+    </ul>
+
+    <p class="mt-16 font-mono text-xs text-ink/70">
+      hecho con astro ·{' '}
+      <a
+        href={site.repoUrl}
+        rel="noopener"
+        class="underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
+      >
+        ver el código
+      </a>
+    </p>
+  </div>
+</footer>
