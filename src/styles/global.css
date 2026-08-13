@@ -1,5 +1,57 @@
 @import "tailwindcss";
 
-/* Los tokens de diseño (paleta, tipografías, escala) se definen aquí con
-   @theme una vez aprobada la dirección visual. Hasta entonces, el sitio usa
-   el font stack del sistema y los colores por defecto de Tailwind. */
+/* Solo los cortes y pesos que realmente se usan, en subset latin (cubre
+   tildes y ñ), para no arrastrar peso muerto al bundle de fuentes. */
+@import "@fontsource/ibm-plex-sans-condensed/latin-600.css";
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-500.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
+@import "@fontsource/ibm-plex-mono/latin-600.css";
+
+@theme {
+  /* Paleta "blueprint de ingeniería" — ver 03-diseno.md */
+  --color-canvas: #f3f5f7;
+  --color-ink: #10151b;
+  --color-panel: #e6eaee;
+  --color-grid: #cbd5df;
+  --color-ok: #1b7a4b;
+  --color-flag: #c2650a;
+
+  --font-display: "IBM Plex Sans Condensed", sans-serif;
+  --font-sans: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-flag);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Trazado sutil de plano técnico: mismo tono que --color-grid, sin capa
+     de opacidad extra (así el texto encima no pierde contraste). */
+  .bg-blueprint-grid {
+    background-image:
+      linear-gradient(var(--color-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+}
