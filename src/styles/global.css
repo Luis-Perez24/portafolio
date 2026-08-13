@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+/* Los tokens de diseño (paleta, tipografías, escala) se definen aquí con
+   @theme una vez aprobada la dirección visual. Hasta entonces, el sitio usa
+   el font stack del sistema y los colores por defecto de Tailwind. */
