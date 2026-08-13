@@ -1,5 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ProjectTeaser from '../components/ProjectTeaser.astro';
+import Skills from '../components/Skills.astro';
+import About from '../components/About.astro';
+import Contact from '../components/Contact.astro';
 import { site, projects } from '../content/site';
 
 const liveProjects = projects.filter((project) => project.status === 'live');
@@ -7,134 +13,55 @@ const wipProjects = projects.filter((project) => project.status === 'wip');
 ---
 
 <Base title={`${site.name} · ${site.title}`} description={site.heroPitch}>
-  <div class="mx-auto max-w-3xl px-4 py-10">
-    <header>
-      <nav aria-label="Secciones">
-        <ul>
-          <li><a href="#proyectos">Proyectos</a></li>
-          <li><a href="#skills">Skills</a></li>
-          <li><a href="#sobre-mi">Sobre mí</a></li>
-          <li><a href="#contacto">Contacto</a></li>
-        </ul>
-      </nav>
-    </header>
+  <a
+    href="#contenido"
+    class="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-50 focus-visible:border focus-visible:border-ink focus-visible:bg-canvas focus-visible:px-4 focus-visible:py-2 focus-visible:font-mono focus-visible:text-sm"
+  >
+    saltar al contenido
+  </a>
 
-    <main>
-      <section aria-labelledby="titulo">
-        <h1 id="titulo">{site.name}</h1>
-        <p>{site.title}</p>
-        <p>{site.heroPitch}</p>
-        <ul>
-          <li><a href="#proyectos">Ver proyectos</a></li>
-          {site.cvPath && <li><a href={site.cvPath} download>Descargar CV</a></li>}
-          <li><a href={site.github} rel="me noopener">GitHub</a></li>
-          {site.linkedin && <li><a href={site.linkedin} rel="me noopener">LinkedIn</a></li>}
-          <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
-        </ul>
-      </section>
+  <header class="sticky top-0 z-10 border-b border-grid bg-canvas/95 backdrop-blur">
+    <nav
+      aria-label="Secciones"
+      class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6"
+    >
+      <span class="font-display text-sm font-semibold uppercase tracking-wide">{site.name}</span>
+      <ul class="flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs uppercase tracking-wide text-ink/70">
+        <li><a href="#proyectos" class="hover:text-ink">proyectos</a></li>
+        <li><a href="#skills" class="hover:text-ink">skills</a></li>
+        <li><a href="#sobre-mi" class="hover:text-ink">sobre mí</a></li>
+        <li><a href="#contacto" class="hover:text-ink">contacto</a></li>
+      </ul>
+    </nav>
+  </header>
 
-      <section id="proyectos" aria-labelledby="titulo-proyectos">
-        <h2 id="titulo-proyectos">Proyectos</h2>
+  <main id="contenido">
+    <Hero site={site} />
 
-        {
-          liveProjects.map((project) => (
-            <article>
-              <h3>{project.name}</h3>
-              <p>{project.tagline}</p>
+    <section id="proyectos" aria-labelledby="titulo-proyectos" class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+      <p class="font-mono text-sm text-ink/70">// 01</p>
+      <h2 id="titulo-proyectos" class="mt-2 font-display text-3xl font-semibold uppercase tracking-tight">
+        Proyectos
+      </h2>
 
-              {project.metric && (
-                <p>
-                  <strong>{project.metric.value}</strong> {project.metric.label}
-                  {project.metric.detail && <span> ({project.metric.detail})</span>}
-                </p>
-              )}
+      <div class="mt-10 grid gap-8">
+        {liveProjects.map((project) => <ProjectCard project={project} />)}
+      </div>
 
-              <h4>Decisiones técnicas</h4>
-              <ul>
-                {project.decisions.map((decision) => (
-                  <li>{decision}</li>
-                ))}
-              </ul>
+      {
+        wipProjects.length > 0 && (
+          <div class="mt-8 grid gap-4">
+            {wipProjects.map((project) => (
+              <ProjectTeaser project={project} />
+            ))}
+          </div>
+        )
+      }
+    </section>
 
-              <h4>Stack</h4>
-              <ul>
-                {project.stack.map((tech) => (
-                  <li>{tech}</li>
-                ))}
-              </ul>
+    <Skills primary={site.skillsPrimary} secondary={site.skillsSecondary} />
+    <About paragraphs={site.about} />
+  </main>
 
-              <ul>
-                {project.repos.map((repo) => (
-                  <li>
-                    <a href={repo.url} rel="noopener">
-                      {repo.label}
-                    </a>
-                  </li>
-                ))}
-                {project.videoUrl && (
-                  <li>
-                    <a href={project.videoUrl} rel="noopener">
-                      Ver demo (60s)
-                    </a>
-                  </li>
-                )}
-                {project.demoUrl && (
-                  <li>
-                    <a href={project.demoUrl} rel="noopener">
-                      Ver demo
-                    </a>
-                  </li>
-                )}
-              </ul>
-            </article>
-          ))
-        }
-
-        {
-          wipProjects.map((project) => (
-            <article>
-              <h3>
-                {project.name} <span>En desarrollo</span>
-              </h3>
-              <p>{project.tagline}</p>
-              <ul>
-                {project.stack.map((tech) => (
-                  <li>{tech}</li>
-                ))}
-              </ul>
-            </article>
-          ))
-        }
-      </section>
-
-      <section id="skills" aria-labelledby="titulo-skills">
-        <h2 id="titulo-skills">Skills</h2>
-        <ul>
-          {site.skillsPrimary.map((skill) => <li>{skill}</li>)}
-        </ul>
-        <p>También trabajo con: {site.skillsSecondary.join(' · ')}</p>
-      </section>
-
-      <section id="sobre-mi" aria-labelledby="titulo-sobre-mi">
-        <h2 id="titulo-sobre-mi">Sobre mí</h2>
-        {site.about.map((line) => <p>{line}</p>)}
-      </section>
-
-      <section id="contacto" aria-labelledby="titulo-contacto">
-        <h2 id="titulo-contacto">Contacto</h2>
-        <ul>
-          <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
-          <li><a href={site.github} rel="me noopener">GitHub</a></li>
-          {site.linkedin && <li><a href={site.linkedin} rel="me noopener">LinkedIn</a></li>}
-          {site.cvPath && <li><a href={site.cvPath} download>Descargar CV</a></li>}
-        </ul>
-      </section>
-    </main>
-
-    <footer>
-      <p>
-        Hecho con Astro · <a href={site.repoUrl} rel="noopener">ver el código</a>
-      </p>
-    </footer>
-  </div>
+  <Contact site={site} />
 </Base>
