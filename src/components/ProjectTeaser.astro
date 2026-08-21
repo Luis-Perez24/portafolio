@@ -1,33 +1,60 @@
 ---
+/**
+ * El proyecto en desarrollo pasaba desapercibido: un borde punteado y una
+ * etiqueta gris al lado de dos cards llenas era casi un pie de página.
+ *
+ * Ahora tiene la misma presencia de card que los demás —mismo ancho, mismo
+ * relleno, mismo radio— pero se distingue por el color secundario: banda
+ * superior violeta, etiqueta con su propio fondo y una franja diagonal muy
+ * tenue que dice «esto todavía se está construyendo» sin escribirlo dos veces.
+ * Sin métrica y sin botones, porque todavía no hay nada que medir ni que ver.
+ */
 import type { Project } from '../content/site';
+import Icon from './Icon.astro';
+import { resolveTechIcon } from './icons';
 
 interface Props {
   project: Project;
+  index?: number;
 }
 
-const { project } = Astro.props;
+const { project, index = 0 } = Astro.props;
 ---
 
-<article class="border border-dashed border-grid px-6 py-5">
-  <header class="flex flex-wrap items-baseline justify-between gap-2">
-    <h3 class="font-display text-xl font-semibold uppercase tracking-tight text-ink/90">
-      {project.name}
-    </h3>
-    <span class="flex items-center gap-2 font-mono text-xs text-ink/70">
-      <span class="h-2 w-2 rounded-full bg-ink/40" aria-hidden="true"></span>
-      en desarrollo
-    </span>
-  </header>
+<article
+  class="v3-wip relative overflow-hidden rounded-xl border border-v3-line bg-v3-surface"
+  data-reveal-item
+  style={`--reveal-delay: ${index * 140}ms`}
+>
+  <span class="absolute inset-x-0 top-0 h-0.5 bg-v3-support" aria-hidden="true"></span>
 
-  <p class="mt-3 text-sm text-ink/90">{project.tagline}</p>
+  <div class="relative px-6 py-7 sm:px-8">
+    <header class="flex flex-wrap items-center justify-between gap-3">
+      <h3 class="text-2xl font-medium tracking-tight text-v3-ink">{project.name}</h3>
+      <span
+        class="inline-flex items-center gap-2 rounded-md bg-v3-wash-support px-2.5 py-1 font-v3-mono text-[11px] uppercase tracking-[0.14em] text-v3-support"
+      >
+        <span class="v3-wip-pulse size-1.5 rounded-full bg-v3-support" aria-hidden="true"></span>
+        en desarrollo
+      </span>
+    </header>
 
-  {
-    project.stack.length > 0 && (
-      <ul class="mt-4 flex flex-wrap gap-2">
-        {project.stack.map((tech) => (
-          <li class="border border-grid px-2 py-1 font-mono text-xs text-ink/70">{tech}</li>
-        ))}
-      </ul>
-    )
-  }
+    <p class="mt-4 max-w-2xl font-light leading-relaxed text-v3-muted">{project.tagline}</p>
+
+    {
+      project.stack.length > 0 && (
+        <ul class="mt-6 flex flex-wrap gap-2">
+          {project.stack.map((tech) => {
+            const icon = resolveTechIcon(tech);
+            return (
+              <li class="inline-flex items-center gap-1.5 rounded-md border border-dashed border-v3-line px-3 py-1.5 font-v3-mono text-xs text-v3-muted">
+                {icon && <Icon name={icon} class="size-3.5 shrink-0 text-v3-muted" />}
+                {tech}
+              </li>
+            );
+          })}
+        </ul>
+      )
+    }
+  </div>
 </article>

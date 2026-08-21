@@ -1,73 +1,59 @@
 ---
 import type { Site } from '../content/site';
+import SectionHeading from './SectionHeading.astro';
+import Icon from './Icon.astro';
+import { contactLinks } from './contact';
 
 interface Props {
   site: Site;
 }
 
 const { site } = Astro.props;
+
+const links = contactLinks(site);
 ---
 
-<footer id="contacto" aria-labelledby="titulo-contacto" class="bg-blueprint-grid border-t border-grid">
-  <div class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-    <p class="font-mono text-sm text-ink/70">// 04</p>
-    <h2 id="titulo-contacto" class="mt-2 font-display text-3xl font-semibold uppercase tracking-tight">
-      Contacto
-    </h2>
+<footer
+  id="contacto"
+  aria-labelledby="titulo-contacto"
+  class="relative scroll-mt-24 overflow-hidden border-t border-v3-line"
+  data-reveal-group
+>
+  <div class="v3-glow absolute inset-0 -z-10" aria-hidden="true"></div>
 
-    <ul class="mt-8 flex flex-wrap gap-x-8 gap-y-3 font-mono text-sm">
-      <li>
-        <a
-          href={`mailto:${site.email}`}
-          class="text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
-        >
-          {site.email}
-        </a>
-      </li>
-      <li>
-        <a
-          href={site.github}
-          rel="me noopener"
-          class="text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
-        >
-          github
-        </a>
-      </li>
+  <div class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+    <div data-reveal style="--reveal-i: 0">
+      <SectionHeading id="titulo-contacto" ordinal="04" title="Contacto" />
+    </div>
+
+    <ul class="mt-10 flex flex-wrap gap-x-8 gap-y-4">
       {
-        site.linkedin && (
-          <li>
+        links.map((link, index) => (
+          <li data-reveal style={`--reveal-i: ${index + 1}`}>
             <a
-              href={site.linkedin}
-              rel="me noopener"
-              class="text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
+              href={link.href}
+              rel={link.rel}
+              download={link.download ? true : undefined}
+              class="v3-hover-scale group inline-flex items-center gap-2.5 font-v3-mono text-sm text-v3-ink transition-colors duration-200 hover:text-v3-accent"
             >
-              linkedin
+              <Icon
+                name={link.medium}
+                class="v3-hover-scale-icon size-[18px] shrink-0 text-v3-muted group-hover:text-v3-accent"
+              />
+              {link.label}
             </a>
           </li>
-        )
-      }
-      {
-        site.cvPath && (
-          <li>
-            <a
-              href={site.cvPath}
-              download
-              class="text-ink underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
-            >
-              descargar cv
-            </a>
-          </li>
-        )
+        ))
       }
     </ul>
 
-    <p class="mt-16 font-mono text-xs text-ink/70">
+    <p
+      class="mt-16 font-v3-mono text-[11px] uppercase tracking-[0.14em] text-v3-muted"
+      data-reveal
+      style={`--reveal-i: ${links.length + 1}`}
+    >
       hecho con astro ·{' '}
-      <a
-        href={site.repoUrl}
-        rel="noopener"
-        class="underline decoration-ink/30 underline-offset-4 hover:decoration-ink"
-      >
+      <a href={site.repoUrl} rel="noopener" class="transition-colors duration-200 hover:text-v3-accent">
         ver el código
       </a>
     </p>

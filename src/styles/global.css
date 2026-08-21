@@ -1,57 +1,438 @@
+/**
+ * Tokens de la dirección visual definitiva (ADR-006): "oscuro cinematográfico
+ * contemporáneo".
+ *
+ * Concepto: estudio de diseño, no laboratorio. El fondo no es negro puro sino
+ * un índigo muy oscuro que sugiere espacio, con halos radiales que le dan aire;
+ * el blanco es cálido. El color viene de la luz, no del papel.
+ *
+ * PALETA (2ª iteración). La primera tenía el ámbar como primario y se leía
+ * demasiado naranja. Ahora el predominante es azul, tomado de Radix Colors con
+ * los mismos pasos en los dos modos:
+ *
+ *   primario   blue   11   (azul, el color de la variante)
+ *   secundario violet 11   (contrapeso frío, sin competir con el azul)
+ *   semántico  green  11 → `ok`
+ *   semántico  amber 11 → `flag`
+ *
+ * El ámbar no desapareció: bajó de primario a semántico. Vive solo en la barra
+ * de proporción de la métrica, donde 99 × HTTP 409 tiene que distinguirse de
+ * la reserva creada. Ahí es dato, no decoración.
+ *
+ * Sistema tipográfico de UNA superfamilia: Space Grotesk hace display y texto
+ * en todos los tamaños, con Space Mono —su compañera del mismo diseño— para
+ * etiquetas y datos.
+ */
+
 @import "tailwindcss";
 
-/* Solo los cortes y pesos que realmente se usan, en subset latin (cubre
-   tildes y ñ), para no arrastrar peso muerto al bundle de fuentes. */
-@import "@fontsource/ibm-plex-sans-condensed/latin-600.css";
-@import "@fontsource/ibm-plex-sans/latin-400.css";
-@import "@fontsource/ibm-plex-sans/latin-500.css";
-@import "@fontsource/ibm-plex-mono/latin-400.css";
-@import "@fontsource/ibm-plex-mono/latin-500.css";
-@import "@fontsource/ibm-plex-mono/latin-600.css";
+@import "@fontsource/space-grotesk/latin-300.css";
+@import "@fontsource/space-grotesk/latin-400.css";
+@import "@fontsource/space-grotesk/latin-500.css";
+@import "@fontsource/space-grotesk/latin-700.css";
+@import "@fontsource/space-mono/latin-400.css";
 
-@theme {
-  /* Paleta "blueprint de ingeniería" — ver 03-diseno.md */
-  --color-canvas: #f3f5f7;
-  --color-ink: #10151b;
-  --color-panel: #e6eaee;
-  --color-grid: #cbd5df;
-  --color-ok: #1b7a4b;
-  --color-flag: #c2650a;
+@theme inline {
+  --color-v3-bg: var(--v3-bg);
+  --color-v3-surface: var(--v3-surface);
+  --color-v3-raised: var(--v3-raised);
+  --color-v3-line: var(--v3-line);
+  --color-v3-wash: var(--v3-wash);
+  --color-v3-wash-support: var(--v3-wash-support);
+  --color-v3-ink: var(--v3-ink);
+  --color-v3-muted: var(--v3-muted);
+  --color-v3-accent: var(--v3-accent);
+  --color-v3-support: var(--v3-support);
+  --color-v3-ok: var(--v3-ok);
+  --color-v3-flag: var(--v3-flag);
 
-  --font-display: "IBM Plex Sans Condensed", sans-serif;
-  --font-sans: "IBM Plex Sans", sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
+  --font-v3-sans: "Space Grotesk", system-ui, sans-serif;
+  --font-v3-mono: "Space Mono", ui-monospace, monospace;
 }
 
-@layer base {
-  body {
-    background-color: var(--color-canvas);
-    color: var(--color-ink);
+[data-variant="v3"][data-theme="dark"] {
+  --v3-bg: #100f16;
+  --v3-surface: #181722;
+  --v3-raised: #1f1d2b;
+  --v3-line: #2c2a3a;
+  --v3-wash: #0d2847; /* blue oscuro 3 */
+  --v3-wash-support: #291f43; /* violet oscuro 3 */
+  --v3-ink: #f2efe9;
+  --v3-muted: #a5a0b4;
+  --v3-accent: #70b8ff; /* blue oscuro 11 */
+  --v3-support: #baa7ff; /* violet oscuro 11 */
+  --v3-ok: #3dd68c; /* green oscuro 11 */
+  --v3-flag: #d8a01f; /* amber oscuro 11, −12 % L */
+  /* Los dos halos toman el primario y el secundario: la luz de la escena es
+     azul, con una entrada violeta por la derecha. */
+  --v3-glow: radial-gradient(70% 55% at 12% 0%, rgb(59 158 255 / 0.15) 0%, transparent 62%),
+    radial-gradient(60% 60% at 88% 20%, rgb(125 102 217 / 0.13) 0%, transparent 66%);
+  --v3-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 24px 60px -34px rgb(0 0 0 / 0.9);
+}
+
+[data-variant="v3"][data-theme="light"] {
+  --v3-bg: #f2eee6;
+  --v3-surface: #fbf8f2;
+  --v3-raised: #ffffff;
+  --v3-line: #dcd5c7;
+  --v3-wash: #e6f4fe; /* blue 3 */
+  --v3-wash-support: #f4f0fe; /* violet 3 */
+  --v3-ink: #1b1922;
+  --v3-muted: #57525f;
+  --v3-accent: #0c6cc0; /* blue 11, −3 % L (va sobre crema, no sobre blue 1) */
+  --v3-support: #6550b9; /* violet 11 */
+  --v3-ok: #1e7951; /* green 11, −2,5 % L */
+  --v3-flag: #9c5b00; /* amber 11, −3 % L */
+  --v3-glow: radial-gradient(70% 55% at 12% 0%, rgb(12 108 192 / 0.09) 0%, transparent 62%),
+    radial-gradient(60% 60% at 88% 20%, rgb(101 80 185 / 0.08) 0%, transparent 66%);
+  --v3-shadow: 0 1px 2px rgb(30 26 20 / 0.05), 0 20px 44px -28px rgb(30 26 20 / 0.4);
+}
+
+[data-variant="v3"] {
+  font-family: var(--font-v3-sans);
+  background-color: var(--v3-bg);
+  color: var(--v3-ink);
+
+  /* El movimiento de la V3 es más marcado que el de la V2: más recorrido, algo
+     más de duración y un escalonado más pronunciado. */
+  --reveal-from: translateY(24px);
+  --reveal-duration: 520ms;
+  --reveal-step: 90ms;
+}
+
+[data-variant="v3"] :focus-visible {
+  outline: 2px solid var(--v3-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.v3-glow {
+  background-image: var(--v3-glow);
+}
+
+.v3-card {
+  box-shadow: var(--v3-shadow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .v3-card {
+    transition:
+      border-color 200ms ease,
+      box-shadow 200ms ease;
   }
 
-  :focus-visible {
-    outline: 2px solid var(--color-flag);
-    outline-offset: 2px;
+  .v3-card:hover {
+    border-color: color-mix(in oklab, var(--v3-accent) 45%, transparent);
   }
+}
 
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
+/* Parallax del hero: solo la capa decorativa se desfasa, nunca el texto que se
+   está leyendo. 10 px sobre los primeros 60vh de scroll — se nota como
+   profundidad, no como efecto. Timeline de scroll en CSS para que corra fuera
+   del hilo principal; donde no está soportado, simplemente no hay parallax. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .v3-parallax {
+      animation: v3-drift linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 60vh;
     }
   }
 }
 
-@layer utilities {
-  /* Trazado sutil de plano técnico: mismo tono que --color-grid, sin capa
-     de opacidad extra (así el texto encima no pierde contraste). */
-  .bg-blueprint-grid {
-    background-image:
-      linear-gradient(var(--color-grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
-    background-size: 32px 32px;
+@keyframes v3-drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(10px);
+  }
+}
+
+/* ── Hueco de la vista previa ───────────────────────────────────────────────
+   Dos manchas desenfocadas a la deriva bajo una retícula fina. Ocupa cero
+   bytes de red y da el mismo ritmo lento que va a tener el clip real. */
+.v3-preview-empty {
+  background-color: var(--v3-bg);
+}
+
+.v3-preview-blob {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(38px);
+  opacity: 0.75;
+}
+
+.v3-preview-blob-a {
+  inset: -20% 45% 10% -15%;
+  background: radial-gradient(closest-side, var(--v3-accent) 0%, transparent 70%);
+  animation: v3-drift-a 19s ease-in-out infinite alternate;
+}
+
+.v3-preview-blob-b {
+  inset: 15% -12% -25% 42%;
+  background: radial-gradient(closest-side, var(--v3-support) 0%, transparent 70%);
+  animation: v3-drift-b 23s ease-in-out infinite alternate;
+}
+
+.v3-preview-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.45;
+  background-image:
+    linear-gradient(var(--v3-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--v3-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+@keyframes v3-drift-a {
+  from {
+    transform: translate3d(-6%, -4%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(10%, 8%, 0) scale(1.15);
+  }
+}
+
+@keyframes v3-drift-b {
+  from {
+    transform: translate3d(6%, 6%, 0) scale(1.1);
+  }
+  to {
+    transform: translate3d(-8%, -6%, 0) scale(0.95);
+  }
+}
+
+/* El hueco es ambiente, no información: con movimiento reducido se congela. */
+@media (prefers-reduced-motion: reduce) {
+  .v3-preview-blob {
+    animation: none;
+  }
+}
+
+/* ── Proyecto en desarrollo ─────────────────────────────────────────────────
+   Franja diagonal muy tenue en el color secundario: se lee como «zona en
+   obra» de lejos, sin agregar una línea de texto más. */
+.v3-wip {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--v3-support) 7%, transparent) 0 2px,
+    transparent 2px 14px
+  );
+}
+
+/* El punto late para que la etiqueta se lea como un estado vivo y no como un
+   sello. Es lento a propósito: sirve para notarlo, no para mirarlo. */
+.v3-wip-pulse {
+  animation: v3-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes v3-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-wip-pulse {
+    animation: none;
+  }
+}
+
+/* ── Hover que agranda el ícono ─────────────────────────────────────────────
+   Lo usan las baldosas de skills y los enlaces de contacto. La escala vive en
+   el ícono y no en su contenedor: agrandar la baldosa movería a sus vecinas y
+   la grilla entera respiraría al pasar el cursor; agrandar el enlace de
+   contacto arrastraría el texto, que a esa escala se ve borroso. */
+@media (hover: hover) and (pointer: fine) {
+  .v3-hover-scale-icon {
+    transition:
+      transform 200ms var(--ease-out),
+      color 200ms ease;
+  }
+
+  .v3-hover-scale:hover .v3-hover-scale-icon {
+    transform: scale(1.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-hover-scale:hover .v3-hover-scale-icon {
+    transform: none;
+  }
+}
+
+/* ── Botones ────────────────────────────────────────────────────────────────
+   Los del hero y los de cada card. La escala es del botón entero y no del
+   ícono: acá el ícono es un adorno del rótulo, y agrandarlo suelto dentro de
+   una caja con borde se vería como un error de alineación.
+
+   150 ms es el tramo de la respuesta a un clic según la skill `animate`; el
+   `:active` viene después del `:hover` a propósito, para que apretar hunda el
+   botón aunque el cursor siga encima. */
+.v3-action {
+  transition:
+    transform 150ms var(--ease-out),
+    border-color 200ms ease,
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .v3-action:hover {
+    transform: scale(1.04);
+  }
+
+  /* Solo los de contorno se tiñen: en el botón macizo del hero el texto ya es
+     del color del fondo y pintarlo de acento lo dejaría ilegible. */
+  .v3-action-outline:hover {
+    border-color: color-mix(in oklab, var(--v3-accent) 55%, transparent);
+    color: var(--v3-accent);
+  }
+}
+
+.v3-action:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-action:hover,
+  .v3-action:active {
+    transform: none;
+  }
+}
+
+/* El borde que se tiñe es exclusivo de las baldosas de skills: los enlaces de
+   contacto no tienen borde que teñir. */
+@media (hover: hover) and (pointer: fine) {
+  .v3-tech {
+    transition: border-color 200ms ease;
+  }
+
+  .v3-tech:hover {
+    border-color: color-mix(in oklab, var(--v3-accent) 45%, transparent);
+  }
+}
+
+/* Baldosa grande del stack principal de skills: suma elevación y un
+   resplandor de acento al borde que ya tiñe `.v3-tech`. El logo recolora aparte
+   (ver `Skills.astro`, es un `group-hover` de Tailwind sobre el ícono). Las
+   chips chicas de "también trabajo con" no llevan esta clase a propósito —
+   tienen que seguir leyéndose como secundarias, solo con el borde. */
+@media (hover: hover) and (pointer: fine) {
+  .v3-tech-tile {
+    transition:
+      background-color 200ms ease,
+      transform 200ms var(--ease-out),
+      box-shadow 200ms ease;
+  }
+
+  .v3-tech-tile:hover {
+    background-color: color-mix(in oklab, var(--v3-accent) 7%, var(--v3-surface));
+    transform: translateY(-3px);
+    box-shadow: 0 16px 28px -18px color-mix(in oklab, var(--v3-accent) 55%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-tech-tile {
+    transform: none !important;
+  }
+}
+
+/* Reveal por máscara para la cifra de la métrica: la receta de scroll reveal de
+   Emil (clip-path + ease-in-out), que es un gesto distinto al fade + slide que
+   usa todo lo demás. */
+[data-motion] .v3-clip {
+  clip-path: inset(-12% 0 112% 0);
+}
+
+[data-motion] [data-reveal-group][data-revealed] .v3-clip {
+  clip-path: inset(-12% 0 -12% 0);
+  transition: clip-path 600ms var(--ease-in-out) var(--reveal-delay);
+}
+
+/* Iconos del toggle: se muestra el del modo activo. */
+[data-variant="v3"][data-theme="light"] .v3-icon-dark,
+[data-variant="v3"][data-theme="dark"] .v3-icon-light {
+  display: none;
+}
+
+/**
+ * Sistema de movimiento: scroll reveal + curvas de la skill `animate`.
+ *
+ * Las curvas no son inventadas: son las de la skill `animate` de Emil
+ * Kowalski. Las built-in de CSS son demasiado débiles para que el movimiento
+ * se lea como intencional.
+ *
+ * Dos mecanismos, a propósito separados:
+ *   - `data-reveal-group` se observa y revela a sus descendientes `data-reveal`
+ *     en cascada, escalonados por `--reveal-i`.
+ *   - `data-reveal-item` se observa y se revela a sí mismo. Es lo que usan las
+ *     cards, que entran como una pieza y contienen su propio grupo dentro.
+ * Sin esa separación, revelar una card dispararía también el grupo de su
+ * métrica, que todavía está fuera del viewport.
+ *
+ * Progressive enhancement: el estado oculto solo aplica dentro de un
+ * contenedor con `data-motion`, y ese atributo lo pone JavaScript en tiempo de
+ * parseo únicamente si el usuario no pidió `prefers-reduced-motion`. Sin JS, o
+ * con movimiento reducido, todo se renderiza en su estado final sin animar —
+ * nunca contenido invisible.
+ */
+
+@theme {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* Sin capa: así gana a las utilidades de Tailwind sin necesitar `!important`. */
+
+[data-motion] [data-reveal],
+[data-motion] [data-reveal-item] {
+  opacity: 0;
+  transform: var(--reveal-from, translateY(12px));
+}
+
+[data-motion] [data-reveal-group][data-revealed] [data-reveal],
+[data-motion] [data-reveal-item][data-revealed] {
+  opacity: 1;
+  transform: var(--reveal-to, none);
+  transition:
+    opacity var(--reveal-duration, 400ms) var(--ease-out) var(--reveal-delay),
+    transform var(--reveal-duration, 400ms) var(--ease-out) var(--reveal-delay);
+}
+
+[data-reveal],
+[data-reveal-item] {
+  --reveal-delay: calc(var(--reveal-i, 0) * var(--reveal-step, 80ms));
+}
+
+/* Cada grupo reinicia el contador, para que un `--reveal-i` heredado de una
+   card no desplace el escalonado de lo que lleva dentro. */
+[data-reveal-group] {
+  --reveal-i: 0;
+}
+
+/* El crossfade del toggle día/noche. Se activa solo durante el cambio para no
+   arrastrar una transición de color en todo lo demás (los hover tienen su
+   propia duración, mucho más corta). */
+[data-theme].is-switching,
+[data-theme].is-switching * {
+  transition:
+    background-color 400ms var(--ease-out),
+    border-color 400ms var(--ease-out),
+    color 400ms var(--ease-out),
+    fill 400ms var(--ease-out),
+    box-shadow 400ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme].is-switching,
+  [data-theme].is-switching * {
+    transition: none;
   }
 }

@@ -1,0 +1,22 @@
+---
+/**
+ * Encabezado de sección de la V3: rótulo en mono con tracking muy abierto sobre
+ * el título en peso ligero y cuerpo grande. Nada de ordinales serif — ese gesto
+ * es de la V2.
+ */
+interface Props {
+  id: string;
+  ordinal: string;
+  title: string;
+}
+
+const { id, ordinal, title } = Astro.props;
+---
+
+<div>
+  <p class="flex items-center gap-3 font-v3-mono text-[11px] uppercase tracking-[0.28em] text-v3-accent">
+    <span class="h-px w-8 bg-v3-accent" aria-hidden="true"></span>
+    <span aria-hidden="true">{ordinal}</span>
+  </p>
+  <h2 id={id} class="mt-4 text-4xl font-light tracking-tight text-v3-ink sm:text-5xl">{title}</h2>
+</div>

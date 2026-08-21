@@ -1,0 +1,72 @@
+---
+/**
+ * V3 — tratamiento de la métrica: **placa de título**.
+ *
+ * La cifra ocupa el ancho como el rótulo de una secuencia: peso 700, tamaño
+ * fluido, y entra descubriéndose por una máscara (clip-path) en vez de contar.
+ * Debajo, una única regla de proporción segmentada muestra el reparto real
+ * medido — no hay tabla ni retícula de puntos, solo la escala del número y la
+ * proporción de una sola línea.
+ *
+ * Distinto a la V1 (100 puntos + contador) y a la V2 (ficha de resultados con
+ * filas): acá la evidencia se presenta como un plano, no como un registro.
+ *
+ * Todo sale de `site.ts`: cifra, etiqueta, pie y los grupos de `distribution`.
+ */
+import type { Metric } from '../content/site';
+
+interface Props {
+  metric: Metric;
+}
+
+const { metric } = Astro.props;
+
+const groups = metric.distribution ?? [];
+const total = groups.reduce((sum, group) => sum + group.count, 0);
+---
+
+<div data-reveal-group>
+  <p
+    class="v3-clip font-bold leading-[0.85] tracking-tighter text-v3-accent tabular-nums"
+    style="font-size: clamp(5rem, 17vw, 10rem); --reveal-i: 0"
+  >
+    {metric.value}
+  </p>
+
+  <p
+    class="mt-4 max-w-xl font-v3-mono text-xs uppercase leading-relaxed tracking-[0.14em] text-v3-ink"
+    data-reveal
+    style="--reveal-i: 1"
+  >
+    {metric.label}
+  </p>
+
+  {
+    groups.length > 0 && (
+      <div class="mt-6" role="img" aria-label={metric.detail ?? metric.label}>
+        <span class="flex h-1 w-full overflow-hidden rounded-full bg-v3-line">
+          {groups.map((group, index) => (
+            <span
+              class:list={[
+                'block h-full origin-left',
+                group.color === 'ok' ? 'bg-v3-ok' : 'bg-v3-flag',
+              ]}
+              style={`width: ${(group.count / total) * 100}%; min-width: 4px; --reveal-i: ${index + 2}; --reveal-from: scaleX(0); --reveal-to: scaleX(1); --reveal-duration: 700ms`}
+              data-reveal
+            />
+          ))}
+        </span>
+
+        {metric.detail && (
+          <p
+            class="mt-3 font-v3-mono text-xs text-v3-muted"
+            data-reveal
+            style={`--reveal-i: ${groups.length + 2}`}
+          >
+            {metric.detail}
+          </p>
+        )}
+      </div>
+    )
+  }
+</div>

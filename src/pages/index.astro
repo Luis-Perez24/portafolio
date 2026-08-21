@@ -1,67 +1,107 @@
 ---
 import Base from '../layouts/Base.astro';
+import ThemeScope from '../components/ThemeScope.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import Runtime from '../components/Runtime.astro';
 import Hero from '../components/Hero.astro';
+import SectionHeading from '../components/SectionHeading.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import ProjectTeaser from '../components/ProjectTeaser.astro';
 import Skills from '../components/Skills.astro';
 import About from '../components/About.astro';
 import Contact from '../components/Contact.astro';
 import { site, projects } from '../content/site';
+import '../styles/global.css';
 
 const liveProjects = projects.filter((project) => project.status === 'live');
 const wipProjects = projects.filter((project) => project.status === 'wip');
 ---
 
 <Base title={`${site.name} · ${site.title}`} description={site.heroPitch}>
-  <a
-    href="#contenido"
-    class="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-50 focus-visible:border focus-visible:border-ink focus-visible:bg-canvas focus-visible:px-4 focus-visible:py-2 focus-visible:font-mono focus-visible:text-sm"
-  >
-    saltar al contenido
-  </a>
-
-  <header class="sticky top-0 z-10 border-b border-grid bg-canvas/95 backdrop-blur">
-    <nav
-      aria-label="Secciones"
-      class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6"
+  <ThemeScope variant="v3" storageKey="portafolio-tema" fallback="dark" system={false}>
+    <a
+      href="#contenido"
+      class="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-50 focus-visible:rounded-md focus-visible:bg-v3-accent focus-visible:px-4 focus-visible:py-2 focus-visible:font-v3-mono focus-visible:text-sm focus-visible:text-v3-bg"
     >
-      <span class="font-display text-sm font-semibold uppercase tracking-wide">{site.name}</span>
-      <ul class="flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs uppercase tracking-wide text-ink/70">
-        <li><a href="#proyectos" class="hover:text-ink">proyectos</a></li>
-        <li><a href="#skills" class="hover:text-ink">skills</a></li>
-        <li><a href="#sobre-mi" class="hover:text-ink">sobre mí</a></li>
-        <li><a href="#contacto" class="hover:text-ink">contacto</a></li>
-      </ul>
-    </nav>
-  </header>
+      saltar al contenido
+    </a>
 
-  <main id="contenido">
-    <Hero site={site} />
+    <header class="sticky top-0 z-10 border-b border-v3-line bg-v3-bg/85 backdrop-blur">
+      <nav
+        aria-label="Secciones"
+        class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6"
+      >
+        <a
+          href="#inicio"
+          class="text-sm font-medium uppercase tracking-[0.18em] text-v3-ink transition-colors duration-200 hover:text-v3-accent"
+        >
+          {site.name}
+        </a>
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+          <ul
+            class="flex flex-wrap gap-x-5 gap-y-1 font-v3-mono text-[11px] uppercase tracking-[0.14em] text-v3-muted"
+          >
+            <li>
+              <a href="#proyectos" class="transition-colors duration-200 hover:text-v3-accent">
+                proyectos
+              </a>
+            </li>
+            <li>
+              <a href="#skills" class="transition-colors duration-200 hover:text-v3-accent">
+                skills
+              </a>
+            </li>
+            <li>
+              <a href="#sobre-mi" class="transition-colors duration-200 hover:text-v3-accent">
+                sobre mí
+              </a>
+            </li>
+            <li>
+              <a href="#contacto" class="transition-colors duration-200 hover:text-v3-accent">
+                contacto
+              </a>
+            </li>
+          </ul>
+          <ThemeToggle />
+        </div>
+      </nav>
+    </header>
 
-    <section id="proyectos" aria-labelledby="titulo-proyectos" class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-      <p class="font-mono text-sm text-ink/70">// 01</p>
-      <h2 id="titulo-proyectos" class="mt-2 font-display text-3xl font-semibold uppercase tracking-tight">
-        Proyectos
-      </h2>
+    <main id="contenido">
+      <Hero site={site} />
 
-      <div class="mt-10 grid gap-8">
-        {liveProjects.map((project) => <ProjectCard project={project} />)}
-      </div>
-
-      {
-        wipProjects.length > 0 && (
-          <div class="mt-8 grid gap-4">
-            {wipProjects.map((project) => (
-              <ProjectTeaser project={project} />
-            ))}
+      <section
+        id="proyectos"
+        aria-labelledby="titulo-proyectos"
+        class="mx-auto max-w-5xl scroll-mt-24 px-4 py-16 sm:px-6"
+      >
+        <div data-reveal-group>
+          <div data-reveal>
+            <SectionHeading id="titulo-proyectos" ordinal="01" title="Proyectos" />
           </div>
-        )
-      }
-    </section>
+        </div>
 
-    <Skills primary={site.skillsPrimary} secondary={site.skillsSecondary} />
-    <About paragraphs={site.about} />
-  </main>
+        <div class="mt-10 grid gap-8">
+          {liveProjects.map((project, index) => <ProjectCard project={project} index={index} />)}
+        </div>
 
-  <Contact site={site} />
+        {
+          wipProjects.length > 0 && (
+            <div class="mt-8 grid gap-4">
+              {wipProjects.map((project, index) => (
+                <ProjectTeaser project={project} index={index} />
+              ))}
+            </div>
+          )
+        }
+      </section>
+
+      <Skills primary={site.skillsPrimary} secondary={site.skillsSecondary} />
+      <About paragraphs={site.about} profile={site.profile} />
+    </main>
+
+    <Contact site={site} />
+  </ThemeScope>
+
+  <Runtime />
 </Base>

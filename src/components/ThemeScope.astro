@@ -1,0 +1,80 @@
+---
+/**
+ * Raíz de la página con modo día/noche propio.
+ *
+ * El modo se guarda en un atributo del contenedor, no en `<html>`, para que
+ * el script inline pueda resolverlo sin esperar a que el resto del documento
+ * termine de parsear.
+ *
+ * El script inline es el primer hijo a propósito: corre mientras el navegador
+ * todavía está parseando el resto del subárbol, así que resuelve el modo antes
+ * del primer pintado y no hay parpadeo de tema. En el primer load decide
+ * `prefers-color-scheme`; a partir de ahí manda lo que el usuario haya elegido
+ * a mano, persistido en localStorage.
+ *
+ * `system={false}` es la excepción: la página arranca siempre en su modo
+ * propio, ignorando el sistema en el primer load. El concepto de esta
+ * dirección visual ES el modo oscuro — si el sistema está en claro (que es lo
+ * que reporta la mayoría de los escritorios), abrir en día mostraría justo lo
+ * que no se está proponiendo. El toggle y la persistencia siguen funcionando
+ * igual.
+ */
+interface Props {
+  /** Namespace de tokens: `v2`, `v3`. */
+  variant: string;
+  storageKey: string;
+  /** Modo con el que arranca si no hay elección previa. */
+  fallback: 'light' | 'dark';
+  /** Si `false`, el primer load ignora `prefers-color-scheme`. */
+  system?: boolean;
+  class?: string;
+}
+
+const { variant, storageKey, fallback, system = true, class: className } = Astro.props;
+---
+
+<div
+  data-variant={variant}
+  data-theme={fallback}
+  data-theme-key={storageKey}
+  data-theme-fallback={fallback}
+  data-theme-system={system ? 'true' : 'false'}
+  class={className}
+>
+  <script is:inline>
+    (function () {
+      var root = document.currentScript.parentElement;
+      var fallback = root.dataset.themeFallback;
+      var theme = null;
+
+      try {
+        var stored = localStorage.getItem(root.dataset.themeKey);
+        if (stored === 'light' || stored === 'dark') theme = stored;
+      } catch (error) {
+        /* Safari en modo privado lanza al tocar localStorage. */
+      }
+
+      if (!theme && root.dataset.themeSystem === 'true') {
+        // Se consulta la preferencia CONTRARIA al fallback: así el sistema
+        // manda cuando se pronuncia, y el fallback gana cuando dice
+        // "no-preference".
+        var opposite = fallback === 'dark' ? 'light' : 'dark';
+        theme = window.matchMedia('(prefers-color-scheme: ' + opposite + ')').matches
+          ? opposite
+          : fallback;
+      }
+
+      if (!theme) theme = fallback;
+
+      root.dataset.theme = theme;
+
+      // El movimiento se habilita solo si hay JS y el usuario no pidió
+      // reducirlo: sin este atributo nada se oculta ni se anima.
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        root.dataset.motion = 'on';
+      }
+    })();
+  </script>
+
+  <slot />
+</div>

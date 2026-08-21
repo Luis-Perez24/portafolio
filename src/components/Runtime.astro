@@ -1,0 +1,130 @@
+---
+/**
+ * Comportamiento de cliente de la landing: el toggle día/noche y el disparo
+ * de los scroll reveals. Se incluye una sola vez.
+ */
+---
+
+<script>
+  type Theme = 'light' | 'dark';
+
+  const SCOPE = '[data-variant][data-theme]';
+  /** Coincide con la duración del crossfade declarada en global.css. */
+  const CROSSFADE_MS = 400;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function syncToggles(scope: HTMLElement): void {
+    const isDark = scope.dataset.theme === 'dark';
+    scope.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((button) => {
+      button.setAttribute('aria-pressed', String(isDark));
+    });
+  }
+
+  function observeScope(scope: HTMLElement): void {
+    const groups = Array.from(
+      scope.querySelectorAll<HTMLElement>('[data-reveal-group], [data-reveal-item]'),
+    );
+
+    if (reduceMotion.matches) {
+      groups.forEach((group) => group.setAttribute('data-revealed', ''));
+      return;
+    }
+
+    // Los bloques están en orden de documento, así que revelar el que entra
+    // implica revelar todo lo anterior: si el usuario saltó a `#contacto` desde
+    // el nav, lo que se salteó nunca va a "entrar" al viewport y se quedaría
+    // invisible.
+    function revealUpTo(index: number): void {
+      for (let position = 0; position <= index; position += 1) {
+        const group = groups[position];
+        if (!group || group.hasAttribute('data-revealed')) continue;
+        group.setAttribute('data-revealed', '');
+        observer.unobserve(group);
+      }
+    }
+
+    // `threshold: 0` en vez de una fracción: una sección puede ser más alta que
+    // el viewport y nunca llegar a mostrar un 25% de sí misma.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          revealUpTo(groups.indexOf(entry.target as HTMLElement));
+        });
+      },
+      { threshold: 0, rootMargin: '0px 0px -10% 0px' },
+    );
+
+    groups.forEach((group) => {
+      // Si un bloque ya quedó por encima del viewport —scroll restaurado, salto
+      // a un ancla, o un cambio de variante estando a media página— nunca va a
+      // "entrar", así que se da por revelado. Sin esto queda invisible para
+      // siempre, que es peor que no animarlo.
+      if (group.getBoundingClientRect().bottom < 0) {
+        group.setAttribute('data-revealed', '');
+        return;
+      }
+      observer.observe(group);
+    });
+  }
+
+  // Los anclajes del nav se desplazan en vez de saltar. Va en JS y no con
+  // `scroll-behavior: smooth` en `html` porque el scroller es el documento
+  // entero, que también contiene contenido fuera del scope animado.
+  document.addEventListener('click', (event) => {
+    if (event.defaultPrevented || event.button !== 0) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const origin = event.target instanceof Element ? event.target : null;
+    const anchor = origin?.closest<HTMLAnchorElement>('a[href^="#"]');
+    if (!anchor || !anchor.closest(SCOPE)) return;
+
+    const id = anchor.getAttribute('href')?.slice(1);
+    if (!id) return;
+
+    const target = document.getElementById(id);
+    if (!target) return;
+
+    event.preventDefault();
+    target.scrollIntoView({
+      behavior: reduceMotion.matches ? 'auto' : 'smooth',
+      block: 'start',
+    });
+
+    // Sin esto el teclado se queda donde estaba y el siguiente Tab continúa
+    // desde el nav, no desde la sección a la que se acaba de llegar.
+    target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
+
+    history.replaceState(null, '', `#${id}`);
+  });
+
+  document.addEventListener('click', (event) => {
+    const origin = event.target instanceof Element ? event.target : null;
+    const button = origin?.closest<HTMLElement>('[data-theme-toggle]');
+    if (!button) return;
+
+    const scope = button.closest<HTMLElement>(SCOPE);
+    if (!scope) return;
+
+    const next: Theme = scope.dataset.theme === 'dark' ? 'light' : 'dark';
+    scope.classList.add('is-switching');
+    scope.dataset.theme = next;
+    syncToggles(scope);
+
+    try {
+      const key = scope.dataset.themeKey;
+      if (key) localStorage.setItem(key, next);
+    } catch (error) {
+      /* Sin persistencia si el navegador no deja escribir. */
+    }
+
+    window.setTimeout(() => scope.classList.remove('is-switching'), CROSSFADE_MS);
+  });
+
+  document.querySelectorAll<HTMLElement>(SCOPE).forEach((scope) => {
+    syncToggles(scope);
+    observeScope(scope);
+  });
+</script>

@@ -1,4 +1,19 @@
 ---
+/**
+ * El stack principal se lee como una grilla de logos, no como una lista de
+ * chips: nueve nombres seguidos en mono eran un muro de texto y nadie los
+ * escaneaba. El nombre sigue estando, en chico y bajo el logo, porque un logo
+ * monocromo suelto se reconoce mal y porque hace falta para leerlo en voz alta.
+ *
+ * El «también trabajo con» se queda en chips pequeños con su logo diminuto: es
+ * lo secundario y tiene que verse secundario, pero ya que los cinco tienen
+ * logo, dejarlo en texto plano habría quedado desparejo con la grilla de
+ * arriba.
+ */
+import SectionHeading from './SectionHeading.astro';
+import Icon from './Icon.astro';
+import { resolveTechIcon } from './icons';
+
 interface Props {
   primary: string[];
   secondary: string[];
@@ -7,21 +22,55 @@ interface Props {
 const { primary, secondary } = Astro.props;
 ---
 
-<section id="skills" aria-labelledby="titulo-skills" class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-  <p class="font-mono text-sm text-ink/70">// 02</p>
-  <h2 id="titulo-skills" class="mt-2 font-display text-3xl font-semibold uppercase tracking-tight">
-    Skills
-  </h2>
+<section
+  id="skills"
+  aria-labelledby="titulo-skills"
+  class="mx-auto max-w-5xl scroll-mt-24 px-4 py-16 sm:px-6"
+  data-reveal-group
+>
+  <div data-reveal style="--reveal-i: 0">
+    <SectionHeading id="titulo-skills" ordinal="02" title="Skills" />
+  </div>
 
-  <ul class="mt-8 flex flex-wrap gap-2">
+  <ul class="mt-10 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
     {
-      primary.map((skill) => (
-        <li class="border border-ink/30 bg-panel px-3 py-1.5 font-mono text-sm text-ink">
-          {skill}
-        </li>
-      ))
+      primary.map((skill, index) => {
+        const icon = resolveTechIcon(skill);
+        return (
+          <li data-reveal style={`--reveal-i: ${index + 1}; --reveal-step: 45ms`}>
+            <div class="v3-tech v3-tech-tile v3-hover-scale group flex h-full flex-col items-center justify-center gap-3 rounded-xl border border-v3-line bg-v3-surface px-3 py-5">
+              {icon && (
+                <Icon
+                  name={icon}
+                  class="v3-hover-scale-icon size-8 text-v3-ink transition-colors duration-200 group-hover:text-v3-accent"
+                />
+              )}
+              <span class="text-center font-v3-mono text-[11px] uppercase tracking-[0.1em] text-v3-muted">
+                {skill}
+              </span>
+            </div>
+          </li>
+        );
+      })
     }
   </ul>
 
-  <p class="mt-6 font-mono text-sm text-ink/70">también trabajo con: {secondary.join(' · ')}</p>
+  <div class="mt-8" data-reveal style={`--reveal-i: ${primary.length + 1}; --reveal-step: 45ms`}>
+    <p class="font-v3-mono text-[11px] uppercase tracking-[0.22em] text-v3-muted">
+      también trabajo con
+    </p>
+    <ul class="mt-4 flex flex-wrap gap-2">
+      {
+        secondary.map((skill) => {
+          const icon = resolveTechIcon(skill);
+          return (
+            <li class="v3-tech v3-hover-scale inline-flex items-center gap-2 rounded-md border border-v3-line px-3 py-1.5">
+              {icon && <Icon name={icon} class="v3-hover-scale-icon size-4 text-v3-muted" />}
+              <span class="font-v3-mono text-xs text-v3-muted">{skill}</span>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
 </section>

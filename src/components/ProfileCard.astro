@@ -1,0 +1,44 @@
+---
+/**
+ * Ficha de datos del «sobre mí»: los campos que antes iban disueltos en el
+ * primer párrafo (formación, ubicación, modalidad) tratados como lo que son
+ * —datos— y no como prosa.
+ *
+ * Grilla de baldosas 2×2, no una lista de definición: mismo idioma visual y
+ * mismo hover (elevación + resplandor de acento, `.v3-tech-tile`) que ya usan
+ * las skills. Reusar el efecto en vez de inventar uno nuevo es lo que hace
+ * que se sienta parte del sitio y no un agregado suelto. El ícono de cada
+ * dato es del mismo catálogo (`icons.ts`) que ya usan skills, stack y
+ * contacto: nada de decoración nueva, es la misma información hecha más
+ * fácil de escanear.
+ */
+import Icon from './Icon.astro';
+import type { ProfileFact } from '../content/site';
+
+interface Props {
+  facts: ProfileFact[];
+}
+
+const { facts } = Astro.props;
+---
+
+<ul class="grid grid-cols-2 gap-3">
+  {
+    facts.map((fact) => (
+      <li>
+        <div class="v3-tech v3-tech-tile flex h-full flex-col gap-3 rounded-xl border border-v3-line bg-v3-surface p-4">
+          <Icon name={fact.icon} class="size-5 shrink-0 text-v3-accent" />
+          <dl>
+            <dt class="font-v3-mono text-[10px] uppercase tracking-[0.2em] text-v3-muted">
+              {fact.label}
+            </dt>
+            <dd class="mt-1 text-sm font-medium leading-snug text-v3-ink">
+              {fact.value}
+              {fact.detail && <span class="mt-0.5 block font-normal text-v3-muted">{fact.detail}</span>}
+            </dd>
+          </dl>
+        </div>
+      </li>
+    ))
+  }
+</ul>

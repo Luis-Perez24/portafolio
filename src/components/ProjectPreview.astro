@@ -1,0 +1,57 @@
+---
+/**
+ * El clip de 6–8 s que encabeza la card del proyecto.
+ *
+ * Mientras no exista el material, el hueco se renderiza igual: es la única
+ * forma de decidir cuánto peso le quita a la métrica, que es la protagonista
+ * de la card. El estado vacío se mueve solo con CSS —sin un byte de video— y
+ * simula el ritmo que va a tener el loop real.
+ *
+ * Cuando llegue el clip: `muted` + `playsinline` son obligatorios para que un
+ * navegador móvil lo deje arrancar solo, y el `poster` cubre el rato de carga
+ * y el caso de que el video no pueda reproducirse.
+ */
+import type { Preview } from '../content/site';
+
+interface Props {
+  preview: Preview | null;
+  /** Nombre del proyecto, para el texto alternativo del hueco. */
+  projectName: string;
+}
+
+const { preview, projectName } = Astro.props;
+---
+
+{/*
+  16:9 en móvil, donde entra completo, y recortado a una banda de 320 px de
+  aquí en adelante. Sin el tope, en escritorio la card mide 1150 px de ancho y
+  la vista previa sola se llevaría 650 px de alto: la métrica, que es la
+  protagonista, quedaría debajo del pliegue. Con material real puede que este
+  recorte haya que revisarlo.
+*/}
+<div class="relative aspect-video max-h-80 w-full overflow-hidden border-b border-v3-line bg-v3-bg">
+  {
+    preview ? (
+      <video
+        class="size-full object-cover"
+        src={preview.clip}
+        poster={preview.poster}
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="metadata"
+        aria-label={preview.alt}
+      />
+    ) : (
+      <div class="v3-preview-empty absolute inset-0" role="img" aria-label={`Vista previa de ${projectName}, pendiente`}>
+        <span class="v3-preview-blob v3-preview-blob-a" />
+        <span class="v3-preview-blob v3-preview-blob-b" />
+        <span class="v3-preview-grid" />
+        <span class="absolute bottom-4 left-4 rounded-md border border-v3-line bg-v3-bg/70 px-2.5 py-1 font-v3-mono text-[10px] uppercase tracking-[0.16em] text-v3-muted backdrop-blur">
+          vista previa · clip de 6–8 s
+        </span>
+      </div>
+    )
+  }
+</div>

@@ -1,20 +1,49 @@
 ---
+/**
+ * El texto ocupaba una columna angosta y dejaba la mitad derecha vacía. Ahora
+ * la acompaña la ficha de datos: el texto se quedó con lo que necesita voz y
+ * los campos (formación, ubicación, modalidad) pasaron a `ProfileCard`.
+ *
+ * En una sola columna hasta `lg`, donde recién hay ancho para las dos sin que
+ * ninguna quede apretada.
+ */
+import SectionHeading from './SectionHeading.astro';
+import ProfileCard from './ProfileCard.astro';
+import type { ProfileFact } from '../content/site';
+
 interface Props {
   paragraphs: string[];
+  profile: ProfileFact[];
 }
 
-const { paragraphs } = Astro.props;
+const { paragraphs, profile } = Astro.props;
 ---
 
-<section id="sobre-mi" aria-labelledby="titulo-sobre-mi" class="border-t border-grid bg-panel/50">
+<section
+  id="sobre-mi"
+  aria-labelledby="titulo-sobre-mi"
+  class="scroll-mt-24 border-t border-v3-line bg-v3-surface"
+  data-reveal-group
+>
   <div class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-    <p class="font-mono text-sm text-ink/70">// 03</p>
-    <h2 id="titulo-sobre-mi" class="mt-2 font-display text-3xl font-semibold uppercase tracking-tight">
-      Sobre mí
-    </h2>
+    <div data-reveal style="--reveal-i: 0">
+      <SectionHeading id="titulo-sobre-mi" ordinal="03" title="Sobre mí" />
+    </div>
 
-    <div class="mt-8 max-w-2xl space-y-4 text-lg leading-relaxed text-ink/90">
-      {paragraphs.map((line) => <p>{line}</p>)}
+    <div class="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16">
+      <div class="space-y-5 text-lg font-light leading-relaxed text-v3-ink">
+        {
+          paragraphs.map((line, index) => (
+            <p data-reveal style={`--reveal-i: ${index + 1}`}>
+              {line}
+            </p>
+          ))
+        }
+      </div>
+
+      <div data-reveal style={`--reveal-i: ${paragraphs.length + 1}`}>
+        <ProfileCard facts={profile} />
+      </div>
     </div>
   </div>
 </section>

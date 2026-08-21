@@ -1,43 +1,63 @@
 ---
 import type { Project } from '../content/site';
-import MetricReadout from './MetricReadout.astro';
+import MetricTitleCard from './MetricTitleCard.astro';
+import ProjectPreview from './ProjectPreview.astro';
+import Icon from './Icon.astro';
+import { resolveTechIcon } from './icons';
 
 interface Props {
   project: Project;
+  index?: number;
 }
 
-const { project } = Astro.props;
+const { project, index = 0 } = Astro.props;
+
+// Antes eran texto suelto con un ícono al lado y no se leían como accionables.
+// Ahora tienen caja propia —borde, relleno y radio, el mismo idioma que los
+// botones del hero— para que se vea de una que se pueden apretar.
+const actionClass =
+  'v3-action v3-action-outline group inline-flex items-center gap-2 rounded-md border border-v3-line bg-v3-raised px-4 py-2.5 font-v3-mono text-xs uppercase tracking-[0.14em] text-v3-ink';
+const actionIconClass =
+  'size-4 shrink-0 text-v3-muted transition-colors duration-200 group-hover:text-v3-accent';
 ---
 
-<article class="border border-grid bg-panel">
-  <header class="flex flex-wrap items-baseline justify-between gap-2 border-b border-grid px-6 py-4">
-    <h3 class="font-display text-2xl font-semibold uppercase tracking-tight">{project.name}</h3>
-    <span class="flex items-center gap-2 font-mono text-xs text-ok">
-      <span class="h-2 w-2 rounded-full bg-ok" aria-hidden="true"></span>
+<article
+  class="v3-card overflow-hidden rounded-xl border border-v3-line bg-v3-surface"
+  data-reveal-item
+  style={`--reveal-delay: ${index * 140}ms`}
+>
+  <ProjectPreview preview={project.preview} projectName={project.name} />
+
+  <header
+    class="flex flex-wrap items-baseline justify-between gap-3 border-b border-v3-line px-6 py-5 sm:px-8"
+  >
+    <h3 class="text-2xl font-medium tracking-tight text-v3-ink">{project.name}</h3>
+    <span
+      class="inline-flex items-center gap-2 rounded-md bg-v3-wash px-2.5 py-1 font-v3-mono text-[11px] uppercase tracking-[0.14em] text-v3-accent"
+    >
+      <span class="size-1.5 rounded-full bg-v3-accent" aria-hidden="true"></span>
       live
     </span>
   </header>
 
-  <div class="px-6 py-5">
-    <p class="text-ink/90">{project.tagline}</p>
+  <div class="px-6 py-8 sm:px-8">
+    <p class="max-w-2xl text-lg font-light leading-relaxed text-v3-muted">{project.tagline}</p>
 
     {
       project.metric && (
-        <div class="mt-5 border-t border-grid pt-5">
-          <MetricReadout metric={project.metric} />
+        <div class="mt-10">
+          <MetricTitleCard metric={project.metric} />
         </div>
       )
     }
 
-    <div class="mt-5 border-t border-grid pt-5">
-      <h4 class="font-mono text-xs uppercase tracking-wide text-ink/70">decisiones</h4>
-      <ul class="mt-3 space-y-2">
+    <div class="mt-10 rounded-lg bg-v3-raised p-6">
+      <h4 class="font-v3-mono text-[11px] uppercase tracking-[0.22em] text-v3-muted">decisiones</h4>
+      <ul class="mt-5 space-y-4">
         {
           project.decisions.map((decision) => (
-            <li class="flex gap-2 text-sm leading-relaxed text-ink/90">
-              <span class="font-mono text-ink/50" aria-hidden="true">
-                -&gt;
-              </span>
+            <li class="flex gap-4 font-light leading-relaxed text-v3-ink">
+              <span class="mt-2 h-px w-4 shrink-0 bg-v3-support" aria-hidden="true" />
               <span>{decision}</span>
             </li>
           ))
@@ -45,50 +65,45 @@ const { project } = Astro.props;
       </ul>
     </div>
 
-    <div class="mt-5 border-t border-grid pt-5">
-      <h4 class="font-mono text-xs uppercase tracking-wide text-ink/70">stack</h4>
-      <ul class="mt-3 flex flex-wrap gap-2">
+    <div class="mt-8">
+      <h4 class="font-v3-mono text-[11px] uppercase tracking-[0.22em] text-v3-muted">stack</h4>
+      <ul class="mt-4 flex flex-wrap gap-2">
         {
-          project.stack.map((tech) => (
-            <li class="border border-grid bg-canvas px-2 py-1 font-mono text-xs text-ink/90">
-              {tech}
-            </li>
-          ))
+          project.stack.map((tech) => {
+            const icon = resolveTechIcon(tech);
+            return (
+              <li class="inline-flex items-center gap-1.5 rounded-md border border-v3-line px-3 py-1.5 font-v3-mono text-xs text-v3-ink">
+                {icon && <Icon name={icon} class="size-3.5 shrink-0 text-v3-muted" />}
+                {tech}
+              </li>
+            );
+          })
         }
       </ul>
     </div>
 
-    <div class="mt-6 flex flex-wrap gap-4 border-t border-grid pt-5 font-mono text-sm">
+    <div class="mt-8 flex flex-wrap gap-3 border-t border-v3-line pt-6">
       {
         project.repos.map((repo) => (
-          <a
-            href={repo.url}
-            rel="noopener"
-            class="text-ink underline decoration-ink/30 underline-offset-4 transition hover:decoration-ink"
-          >
-            $ {repo.label.toLowerCase()}
+          <a href={repo.url} rel="noopener" class={actionClass}>
+            <Icon name="github" class={actionIconClass} />
+            {repo.label}
           </a>
         ))
       }
       {
         project.videoUrl && (
-          <a
-            href={project.videoUrl}
-            rel="noopener"
-            class="text-ink underline decoration-ink/30 underline-offset-4 transition hover:decoration-ink"
-          >
-            $ ver demo (60s)
+          <a href={project.videoUrl} rel="noopener" class={actionClass}>
+            <Icon name="play" class={actionIconClass} />
+            Ver demo (60s)
           </a>
         )
       }
       {
         project.demoUrl && (
-          <a
-            href={project.demoUrl}
-            rel="noopener"
-            class="text-ink underline decoration-ink/30 underline-offset-4 transition hover:decoration-ink"
-          >
-            $ ver demo
+          <a href={project.demoUrl} rel="noopener" class={actionClass}>
+            <Icon name="external" class={actionIconClass} />
+            Ver demo
           </a>
         )
       }

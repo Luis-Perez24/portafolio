@@ -1,0 +1,60 @@
+---
+/**
+ * Dibuja cualquier ícono de `icons.ts` en el color que herede.
+ *
+ * Por defecto es decorativo (`aria-hidden`): casi siempre acompaña a un texto
+ * que ya dice lo mismo, y anunciarlo dos veces es ruido para un lector de
+ * pantalla. Cuando el ícono va solo —sin etiqueta al lado— hay que pasarle
+ * `labelled` para que exponga su nombre.
+ */
+import { icons, type IconName } from './icons';
+
+interface Props {
+  name: IconName;
+  class?: string;
+  /** `true` cuando el ícono es la única pista de qué es la cosa. */
+  labelled?: boolean;
+}
+
+const { name, class: className, labelled = false } = Astro.props;
+const icon = icons[name];
+// Casi todos los trazados vienen en 24×24; el de Java llega en 128×128 desde
+// devicon y se declara su propia caja en vez de reescalarlo a mano.
+const viewBox = 'viewBox' in icon ? icon.viewBox : '0 0 24 24';
+---
+
+{
+  icon.kind === 'fill' ? (
+    <svg
+      class={className}
+      viewBox={viewBox}
+      fill="currentColor"
+      role={labelled ? 'img' : undefined}
+      aria-label={labelled ? icon.title : undefined}
+      aria-hidden={labelled ? undefined : 'true'}
+      focusable="false"
+    >
+      {icon.paths.map((d) => (
+        <path d={d} />
+      ))}
+    </svg>
+  ) : (
+    <svg
+      class={className}
+      viewBox={viewBox}
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      role={labelled ? 'img' : undefined}
+      aria-label={labelled ? icon.title : undefined}
+      aria-hidden={labelled ? undefined : 'true'}
+      focusable="false"
+    >
+      {icon.paths.map((d) => (
+        <path d={d} />
+      ))}
+    </svg>
+  )
+}
