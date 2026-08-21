@@ -173,7 +173,7 @@ export const projects: Project[] = [
       { label: 'Ver código', url: 'https://github.com/Luis-Perez24/ReservaFacil' },
     ],
     videoUrl: null,
-    demoUrl: null,
+    demoUrl: 'https://reservafacil.lperez.dev',
     status: 'live',
   },
   {
@@ -199,7 +199,7 @@ export const projects: Project[] = [
       },
     ],
     videoUrl: null,
-    demoUrl: null,
+    demoUrl: 'https://patipets.lperez.dev',
     status: 'live',
   },
   {
