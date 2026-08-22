@@ -173,7 +173,7 @@ export const projects: Project[] = [
       { label: 'Ver código', url: 'https://github.com/Luis-Perez24/ReservaFacil' },
     ],
     videoUrl: null,
-    demoUrl: 'https://reservafacil.lperez.dev',
+    demoUrl: 'https://reservafacil.lperez.dev/barberia-nogal',
     status: 'live',
   },
   {
