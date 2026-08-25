@@ -69,6 +69,42 @@
     });
   }
 
+  // Resalta en el nav el link de la sección que está cruzando el centro del
+  // viewport. Banda angosta (`rootMargin`) en vez de un umbral de porcentaje:
+  // una sección puede ser más alta que el viewport y nunca cubrir, por
+  // ejemplo, un 50% de sí misma.
+  function observeSectionNav(scope: HTMLElement): void {
+    const nav = scope.querySelector<HTMLElement>('[data-section-nav]');
+    if (!nav) return;
+
+    const links = Array.from(nav.querySelectorAll<HTMLAnchorElement>('.v3-nav-link[href^="#"]'));
+    const sections = links
+      .map((link) => document.getElementById(link.getAttribute('href')!.slice(1)))
+      .filter((section): section is HTMLElement => section !== null);
+
+    if (sections.length === 0) return;
+
+    function setActive(id: string): void {
+      links.forEach((link) => {
+        if (link.getAttribute('href') === `#${id}`) {
+          link.setAttribute('aria-current', 'location');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+    }
+
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.find((entry) => entry.isIntersecting);
+        if (visible) setActive(visible.target.id);
+      },
+      { rootMargin: '-45% 0px -50% 0px', threshold: 0 },
+    );
+
+    sections.forEach((section) => sectionObserver.observe(section));
+  }
+
   // Los anclajes del nav se desplazan en vez de saltar. Va en JS y no con
   // `scroll-behavior: smooth` en `html` porque el scroller es el documento
   // entero, que también contiene contenido fuera del scope animado.
@@ -126,5 +162,6 @@
   document.querySelectorAll<HTMLElement>(SCOPE).forEach((scope) => {
     syncToggles(scope);
     observeScope(scope);
+    observeSectionNav(scope);
   });
 </script>

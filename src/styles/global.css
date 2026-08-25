@@ -110,6 +110,27 @@
   background-image: var(--v3-glow);
 }
 
+/* Indicador de sección activa en el nav: JS marca `aria-current="location"`
+   en el link cuya sección ocupa el centro del viewport (ver Runtime.astro). */
+.v3-nav-link {
+  position: relative;
+}
+
+.v3-nav-link[aria-current="location"] {
+  color: var(--v3-accent);
+}
+
+.v3-nav-link[aria-current="location"]::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1.5px;
+  background: var(--v3-accent);
+  border-radius: 1px;
+}
+
 .v3-card {
   box-shadow: var(--v3-shadow);
 }
