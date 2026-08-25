@@ -74,24 +74,42 @@
   // una sección puede ser más alta que el viewport y nunca cubrir, por
   // ejemplo, un 50% de sí misma.
   function observeSectionNav(scope: HTMLElement): void {
-    const nav = scope.querySelector<HTMLElement>('[data-section-nav]');
-    if (!nav) return;
+    const navList = scope.querySelector<HTMLElement>('[data-section-nav]');
+    if (!navList) return;
+    const list = navList;
 
-    const links = Array.from(nav.querySelectorAll<HTMLAnchorElement>('.v3-nav-link[href^="#"]'));
+    const indicator = list.querySelector<HTMLElement>('.v3-nav-indicator');
+    const links = Array.from(list.querySelectorAll<HTMLAnchorElement>('.v3-nav-link[href^="#"]'));
     const sections = links
       .map((link) => document.getElementById(link.getAttribute('href')!.slice(1)))
       .filter((section): section is HTMLElement => section !== null);
 
     if (sections.length === 0) return;
 
+    // Base de 1px con `transform-origin: left top`: trasladar posiciona el
+    // borde izquierdo y `scaleX` estira desde ahí, así que el resultado queda
+    // exactamente del ancho y en la posición del link, sin animar `width`.
+    function moveIndicatorTo(link: HTMLAnchorElement): void {
+      if (!indicator) return;
+      const listRect = list.getBoundingClientRect();
+      const linkRect = link.getBoundingClientRect();
+      const x = linkRect.left - listRect.left;
+      const y = linkRect.bottom - listRect.top + 6;
+      indicator.style.opacity = '1';
+      indicator.style.transform = `translate(${x}px, ${y}px) scaleX(${linkRect.width})`;
+    }
+
     function setActive(id: string): void {
+      let activeLink: HTMLAnchorElement | null = null;
       links.forEach((link) => {
         if (link.getAttribute('href') === `#${id}`) {
           link.setAttribute('aria-current', 'location');
+          activeLink = link;
         } else {
           link.removeAttribute('aria-current');
         }
       });
+      if (activeLink) moveIndicatorTo(activeLink);
     }
 
     const sectionObserver = new IntersectionObserver(
@@ -103,6 +121,13 @@
     );
 
     sections.forEach((section) => sectionObserver.observe(section));
+
+    // El nav puede pasar a dos líneas en pantallas angostas: si el viewport
+    // cambia de ancho, el link activo se recoloca sin esperar a un scroll.
+    window.addEventListener('resize', () => {
+      const current = links.find((link) => link.getAttribute('aria-current') === 'location');
+      if (current) moveIndicatorTo(current);
+    });
   }
 
   // Los anclajes del nav se desplazan en vez de saltar. Va en JS y no con

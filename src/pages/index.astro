@@ -40,8 +40,9 @@ const wipProjects = projects.filter((project) => project.status === 'wip');
         <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
           <ul
             data-section-nav
-            class="flex flex-wrap gap-x-5 gap-y-1 font-v3-mono text-[11px] uppercase tracking-[0.14em] text-v3-muted"
+            class="relative flex flex-wrap gap-x-5 gap-y-1 font-v3-mono text-[11px] uppercase tracking-[0.14em] text-v3-muted"
           >
+            <span class="v3-nav-indicator" aria-hidden="true"></span>
             <li>
               <a href="#proyectos" class="v3-nav-link transition-colors duration-200 hover:text-v3-accent">
                 proyectos
