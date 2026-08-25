@@ -395,6 +395,24 @@
   display: none;
 }
 
+/* Modal de detalle de proyecto: <dialog> nativo (foco atrapado, Escape y
+   restauración de foco al cerrar vienen gratis del navegador). Solo hace
+   falta resetear el borde/relleno/fondo que le pone el user-agent — el panel
+   interno, con clases de Tailwind, controla toda la apariencia real. */
+.v3-dialog {
+  margin: auto;
+  max-width: min(640px, calc(100vw - 2rem));
+  padding: 0;
+  border: none;
+  border-radius: 0.75rem;
+  background: transparent;
+  color: inherit;
+}
+
+.v3-dialog::backdrop {
+  background: color-mix(in oklab, black 55%, transparent);
+}
+
 /**
  * Sistema de movimiento: scroll reveal + curvas de la skill `animate`.
  *

@@ -219,4 +219,29 @@
     observeScope(scope);
     observeSectionNav(scope);
   });
+
+  // Modal de detalle de proyecto: <dialog> nativo. El navegador ya atrapa el
+  // foco, cierra con Escape y devuelve el foco al botón que lo abrió; solo
+  // hace falta cablear el botón "Ver más", el de cerrar y el click afuera.
+  document.addEventListener('click', (event) => {
+    const origin = event.target instanceof Element ? event.target : null;
+    const opener = origin?.closest<HTMLElement>('[data-open-dialog]');
+    if (!opener) return;
+
+    const dialog = document.getElementById(opener.dataset.openDialog ?? '');
+    if (dialog instanceof HTMLDialogElement) dialog.showModal();
+  });
+
+  document.addEventListener('click', (event) => {
+    const origin = event.target instanceof Element ? event.target : null;
+    if (origin?.closest('[data-close-dialog]')) {
+      origin.closest('dialog')?.close();
+      return;
+    }
+
+    // Un click directo sobre el <dialog> (no sobre su panel interno) cayó
+    // fuera del panel, es decir, sobre el ::backdrop — cerrarlo imita el
+    // comportamiento estándar de "click afuera para cerrar".
+    if (origin instanceof HTMLDialogElement) origin.close();
+  });
 </script>

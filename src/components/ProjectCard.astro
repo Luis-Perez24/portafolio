@@ -19,6 +19,8 @@ const actionClass =
   'v3-action v3-action-outline group inline-flex items-center gap-2 rounded-md border border-v3-line bg-v3-raised px-4 py-2.5 font-v3-mono text-xs uppercase tracking-[0.14em] text-v3-ink';
 const actionIconClass =
   'size-4 shrink-0 text-v3-muted transition-colors duration-200 group-hover:text-v3-accent';
+
+const dialogId = `detalle-${project.id}`;
 ---
 
 <article
@@ -51,54 +53,7 @@ const actionIconClass =
       )
     }
 
-    <div class="mt-10 rounded-lg bg-v3-raised p-6">
-      <h4 class="font-v3-mono text-[11px] uppercase tracking-[0.22em] text-v3-muted">decisiones</h4>
-      <ul class="mt-5 space-y-4">
-        {
-          project.decisions.map((decision) => (
-            <li class="flex gap-4 font-light leading-relaxed text-v3-ink">
-              <span class="mt-2 h-px w-4 shrink-0 bg-v3-support" aria-hidden="true" />
-              <span>{decision}</span>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-
-    <div class="mt-8">
-      <h4 class="font-v3-mono text-[11px] uppercase tracking-[0.22em] text-v3-muted">stack</h4>
-      <ul class="mt-4 flex flex-wrap gap-2">
-        {
-          project.stack.map((tech) => {
-            const icon = resolveTechIcon(tech);
-            return (
-              <li class="inline-flex items-center gap-1.5 rounded-md border border-v3-line px-3 py-1.5 font-v3-mono text-xs text-v3-ink">
-                {icon && <Icon name={icon} class="size-3.5 shrink-0 text-v3-muted" />}
-                {tech}
-              </li>
-            );
-          })
-        }
-      </ul>
-    </div>
-
     <div class="mt-8 flex flex-wrap gap-3 border-t border-v3-line pt-6">
-      {
-        project.repos.map((repo) => (
-          <a href={repo.url} rel="noopener" class={actionClass}>
-            <Icon name="github" class={actionIconClass} />
-            {repo.label}
-          </a>
-        ))
-      }
-      {
-        project.videoUrl && (
-          <a href={project.videoUrl} rel="noopener" class={actionClass}>
-            <Icon name="play" class={actionIconClass} />
-            Ver demo (60s)
-          </a>
-        )
-      }
       {
         project.demoUrl && (
           <a href={project.demoUrl} rel="noopener" class={actionClass}>
@@ -107,6 +62,80 @@ const actionIconClass =
           </a>
         )
       }
+      <button type="button" class={actionClass} data-open-dialog={dialogId}>
+        <Icon name="expand" class={actionIconClass} />
+        Ver más
+      </button>
     </div>
   </div>
+
+  <dialog id={dialogId} class="v3-dialog" aria-labelledby={`${dialogId}-titulo`}>
+    <div class="v3-dialog-panel flex max-h-[85vh] flex-col overflow-y-auto rounded-xl border border-v3-line bg-v3-surface">
+      <header class="flex items-start justify-between gap-4 border-b border-v3-line px-6 py-5 sm:px-8">
+        <h3 id={`${dialogId}-titulo`} class="text-2xl font-medium tracking-tight text-v3-ink">
+          {project.name}
+        </h3>
+        <button
+          type="button"
+          data-close-dialog
+          class="v3-action rounded-md border border-v3-line bg-v3-raised p-2 text-v3-muted"
+          aria-label={`Cerrar detalle de ${project.name}`}
+        >
+          <Icon name="close" class="size-4" />
+        </button>
+      </header>
+
+      <div class="px-6 py-8 sm:px-8">
+        <div class="rounded-lg bg-v3-raised p-6">
+          <h4 class="font-v3-mono text-[11px] uppercase tracking-[0.22em] text-v3-muted">decisiones</h4>
+          <ul class="mt-5 space-y-4">
+            {
+              project.decisions.map((decision) => (
+                <li class="flex gap-4 font-light leading-relaxed text-v3-ink">
+                  <span class="mt-2 h-px w-4 shrink-0 bg-v3-support" aria-hidden="true" />
+                  <span>{decision}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="mt-8">
+          <h4 class="font-v3-mono text-[11px] uppercase tracking-[0.22em] text-v3-muted">stack</h4>
+          <ul class="mt-4 flex flex-wrap gap-2">
+            {
+              project.stack.map((tech) => {
+                const icon = resolveTechIcon(tech);
+                return (
+                  <li class="inline-flex items-center gap-1.5 rounded-md border border-v3-line px-3 py-1.5 font-v3-mono text-xs text-v3-ink">
+                    {icon && <Icon name={icon} class="size-3.5 shrink-0 text-v3-muted" />}
+                    {tech}
+                  </li>
+                );
+              })
+            }
+          </ul>
+        </div>
+
+        <div class="mt-8 flex flex-wrap gap-3 border-t border-v3-line pt-6">
+          {
+            project.repos.map((repo) => (
+              <a href={repo.url} rel="noopener" class={actionClass}>
+                <Icon name="github" class={actionIconClass} />
+                {repo.label}
+              </a>
+            ))
+          }
+          {
+            project.videoUrl && (
+              <a href={project.videoUrl} rel="noopener" class={actionClass}>
+                <Icon name="play" class={actionIconClass} />
+                Ver demo (60s)
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </dialog>
 </article>
