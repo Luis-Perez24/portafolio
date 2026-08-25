@@ -110,6 +110,39 @@
   background-image: var(--v3-glow);
 }
 
+/* Indicador de sección activa en el nav: JS marca `aria-current="location"`
+   en el link cuya sección ocupa el centro del viewport (ver Runtime.astro),
+   y desliza `.v3-nav-indicator` hasta su posición en vez de hacerla
+   aparecer/desaparecer debajo de cada link. Base de 1px + `scaleX` en vez de
+   animar `width`: son las únicas propiedades de transform que la skill de
+   motion del proyecto sanciona para animar. */
+.v3-nav-link[aria-current="location"] {
+  color: var(--v3-accent);
+}
+
+.v3-nav-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 1.5px;
+  width: 1px;
+  background: var(--v3-accent);
+  border-radius: 1px;
+  opacity: 0;
+  transform-origin: left top;
+  pointer-events: none;
+  transition:
+    transform 320ms var(--ease-out),
+    opacity 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-nav-indicator {
+    /* Sigue saltando a la posición correcta, solo sin deslizarse. */
+    transition: opacity 200ms ease;
+  }
+}
+
 .v3-card {
   box-shadow: var(--v3-shadow);
 }
