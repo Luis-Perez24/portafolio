@@ -69,10 +69,13 @@
     });
   }
 
-  // Resalta en el nav el link de la sección que está cruzando el centro del
-  // viewport. Banda angosta (`rootMargin`) en vez de un umbral de porcentaje:
-  // una sección puede ser más alta que el viewport y nunca cubrir, por
-  // ejemplo, un 50% de sí misma.
+  // Resalta en el nav la última sección cuyo borde superior ya cruzó la línea
+  // de referencia (40% del viewport). No usa IntersectionObserver con una
+  // banda angosta: con scroll rápido una sección puede recorrer esa banda
+  // completa entre dos chequeos del navegador sin que llegue a detectarse —
+  // pasaba con "sobre mí" al subir rápido desde contacto. Recalcular la
+  // posición completa en cada scroll no puede saltarse ninguna sección,
+  // sin importar la velocidad.
   function observeSectionNav(scope: HTMLElement): void {
     const navList = scope.querySelector<HTMLElement>('[data-section-nav]');
     if (!navList) return;
@@ -112,38 +115,49 @@
       if (activeLink) moveIndicatorTo(activeLink);
     }
 
-    const sectionObserver = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.find((entry) => entry.isIntersecting);
-        if (visible) setActive(visible.target.id);
-      },
-      { rootMargin: '-45% 0px -50% 0px', threshold: 0 },
-    );
-
-    sections.forEach((section) => sectionObserver.observe(section));
-
-    // La última sección (contacto) es un footer más bajo que la banda que
-    // vigila el observer, y al llegar al fondo de la página no hay más
-    // scroll posible para que su borde termine de cruzarla: se queda sin
-    // activar nunca y el nav se congela en la sección anterior. Se cubre
-    // ese caso a mano, detectando el fondo real del documento.
-    const lastSectionId = sections[sections.length - 1].id;
-    function checkDocumentEnd(): void {
-      const scrollBottom = window.scrollY + window.innerHeight;
-      const atBottom = scrollBottom >= document.documentElement.scrollHeight - 2;
-      if (atBottom) setActive(lastSectionId);
+    function clearActive(): void {
+      links.forEach((link) => link.removeAttribute('aria-current'));
+      if (indicator) indicator.style.opacity = '0';
     }
 
-    window.addEventListener('scroll', checkDocumentEnd, { passive: true });
-    checkDocumentEnd();
+    // Las secciones están en orden de documento: la última cuyo borde
+    // superior ya pasó la línea de referencia es la sección actual. Al
+    // llegar al fondo real de la página (footer de contacto más bajo que el
+    // resto) se fuerza la última, porque su borde puede no alcanzar nunca
+    // esa línea si la página no tiene más scroll para empujarlo.
+    function updateActiveSection(): void {
+      const referenceLine = window.innerHeight * 0.4;
+      let currentId: string | null = null;
 
-    // El nav puede pasar a dos líneas en pantallas angostas: si el viewport
-    // cambia de ancho, el link activo se recoloca sin esperar a un scroll.
-    window.addEventListener('resize', () => {
-      const current = links.find((link) => link.getAttribute('aria-current') === 'location');
-      if (current) moveIndicatorTo(current);
-      checkDocumentEnd();
-    });
+      for (const section of sections) {
+        if (section.getBoundingClientRect().top <= referenceLine) {
+          currentId = section.id;
+        } else {
+          break;
+        }
+      }
+
+      const atBottom =
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      if (atBottom) currentId = sections[sections.length - 1].id;
+
+      if (currentId) setActive(currentId);
+      else clearActive();
+    }
+
+    let ticking = false;
+    function onScrollOrResize(): void {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        updateActiveSection();
+        ticking = false;
+      });
+    }
+
+    window.addEventListener('scroll', onScrollOrResize, { passive: true });
+    window.addEventListener('resize', onScrollOrResize);
+    updateActiveSection();
   }
 
   // Los anclajes del nav se desplazan en vez de saltar. Va en JS y no con
