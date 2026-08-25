@@ -122,11 +122,27 @@
 
     sections.forEach((section) => sectionObserver.observe(section));
 
+    // La última sección (contacto) es un footer más bajo que la banda que
+    // vigila el observer, y al llegar al fondo de la página no hay más
+    // scroll posible para que su borde termine de cruzarla: se queda sin
+    // activar nunca y el nav se congela en la sección anterior. Se cubre
+    // ese caso a mano, detectando el fondo real del documento.
+    const lastSectionId = sections[sections.length - 1].id;
+    function checkDocumentEnd(): void {
+      const scrollBottom = window.scrollY + window.innerHeight;
+      const atBottom = scrollBottom >= document.documentElement.scrollHeight - 2;
+      if (atBottom) setActive(lastSectionId);
+    }
+
+    window.addEventListener('scroll', checkDocumentEnd, { passive: true });
+    checkDocumentEnd();
+
     // El nav puede pasar a dos líneas en pantallas angostas: si el viewport
     // cambia de ancho, el link activo se recoloca sin esperar a un scroll.
     window.addEventListener('resize', () => {
       const current = links.find((link) => link.getAttribute('aria-current') === 'location');
       if (current) moveIndicatorTo(current);
+      checkDocumentEnd();
     });
   }
 
