@@ -413,6 +413,47 @@
   background: color-mix(in oklab, black 55%, transparent);
 }
 
+/* Con el modal abierto, la página de fondo deja de scrollear: sin esto, al
+   llegar al fondo del panel el scroll "se pasa" al documento de atrás.
+   `:has()` ya cubre los navegadores objetivo del sitio (igual que
+   `color-mix`, ya en uso). `overscroll-contain` en el body del panel es un
+   refuerzo por si el scroll-chaining ocurre antes de que el navegador
+   aplique este estilo. */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+/* Botón de cerrar del modal: más presencia que un `.v3-action` genérico
+   —tinte de acento en vez de solo teñir el borde— porque es la única salida
+   visible del modal y tiene que notarse de un vistazo. */
+.v3-dialog-close {
+  transition:
+    transform 150ms var(--ease-out),
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .v3-dialog-close:hover {
+    transform: scale(1.12);
+    background-color: color-mix(in oklab, var(--v3-accent) 18%, var(--v3-raised));
+    border-color: color-mix(in oklab, var(--v3-accent) 60%, transparent);
+    color: var(--v3-accent);
+  }
+}
+
+.v3-dialog-close:active {
+  transform: scale(0.94);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3-dialog-close:hover,
+  .v3-dialog-close:active {
+    transform: none;
+  }
+}
+
 /**
  * Sistema de movimiento: scroll reveal + curvas de la skill `animate`.
  *
